@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.20.12/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-4 min-h-screen">
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState } = React;
+        
+        const UserManagement = () => {
+            const [users, setUsers] = useState([
+                { id: 1, username: "demo", email: "demo@nearbuycart.com", countryCode: "91", phoneNumber: "9556132160", activated: true, role: "buyer" }
+            ]);
+
+            return (
+                <div>
+                    <h1 className="text-xl font-bold text-center text-blue-400">All Users</h1>
+                    <div className="flex justify-between my-4">
+                        <button className="bg-blue-500 px-4 py-2 rounded">Back</button>
+                        <div>
+                            <button className="bg-blue-500 px-4 py-2 mx-2 rounded">Filter</button>
+                            <button className="bg-blue-500 px-4 py-2 rounded">Add User</button>
+                        </div>
+                    </div>
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-gray-700">
+                                    <th className="p-2">ID</th>
+                                    <th className="p-2">Username</th>
+                                    <th className="p-2">Email</th>
+                                    <th className="p-2">Country Code</th>
+                                    <th className="p-2">Phone Number</th>
+                                    <th className="p-2">Activated</th>
+                                    <th className="p-2">Roles</th>
+                                    <th className="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user => (
+                                    <tr key={user.id} className="border-b border-gray-700">
+                                        <td className="p-2">{user.id}</td>
+                                        <td className="p-2">{user.username}</td>
+                                        <td className="p-2">{user.email}</td>
+                                        <td className="p-2">{user.countryCode}</td>
+                                        <td className="p-2">{user.phoneNumber}</td>
+                                        <td className="p-2">{user.activated ? "Yes" : "No"}</td>
+                                        <td className="p-2">{user.role}</td>
+                                        <td className="p-2">
+                                            <button className="bg-green-500 px-2 py-1 mx-1 rounded">Activate</button>
+                                            <button className="bg-yellow-500 px-2 py-1 mx-1 rounded">Edit</button>
+                                            <button className="bg-blue-500 px-2 py-1 mx-1 rounded">View</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+        
+        ReactDOM.createRoot(document.getElementById("root")).render(<UserManagement />);
+    </script>
+</body>
+</html>
