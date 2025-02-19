@@ -16,13 +16,14 @@
 
         const UserManagement = () => {
             const [users, setUsers] = useState([
-                { id: 1, username: "demo", email: "demo@nearbuycart.com", countryCode: "91", phoneNumber: "9556132160", activated: true, role: "buyer" }
+                { id: 1, username: "demo", email: "demo@nearbuycart.com", countryCode: "91", phoneNumber: "9556132160", activated: true, role: "buyer", createdAt: "2024-02-19", updatedAt: "2024-02-19" }
             ]);
-
+            
             const [showForm, setShowForm] = useState(false);
             const [editingUser, setEditingUser] = useState(null);
             const [newUser, setNewUser] = useState({ username: "", email: "", countryCode: "", phoneNumber: "", activated: false, role: "" });
             const [filterText, setFilterText] = useState("");
+            const [viewUser, setViewUser] = useState(null);
 
             // Handles input change for add/edit form
             const handleInputChange = (e) => {
@@ -30,15 +31,13 @@
                 setNewUser({ ...newUser, [name]: value });
             };
 
-            // Adds a new user
+            // Adds or Edits a user
             const handleAddUser = () => {
                 if (editingUser) {
-                    // Edit existing user
                     setUsers(users.map(user => (user.id === editingUser.id ? { ...editingUser, ...newUser } : user)));
                     setEditingUser(null);
                 } else {
-                    // Add new user
-                    setUsers([...users, { id: users.length + 1, ...newUser }]);
+                    setUsers([...users, { id: users.length + 1, ...newUser, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }]);
                 }
                 setShowForm(false);
                 setNewUser({ username: "", email: "", countryCode: "", phoneNumber: "", activated: false, role: "" });
@@ -49,6 +48,11 @@
                 setEditingUser(user);
                 setNewUser(user);
                 setShowForm(true);
+            };
+
+            // Toggle user activation
+            const handleToggleActivation = (id) => {
+                setUsers(users.map(user => (user.id === id ? { ...user, activated: !user.activated } : user)));
             };
 
             // Filters users by username, email, or role
@@ -115,9 +119,9 @@
                                         <td className="p-2">{user.activated ? "Yes" : "No"}</td>
                                         <td className="p-2">{user.role}</td>
                                         <td className="p-2">
-                                            <button className="bg-green-500 px-2 py-1 mx-1 rounded">Activate</button>
+                                            <button className="bg-green-500 px-2 py-1 mx-1 rounded" onClick={() => handleToggleActivation(user.id)}>{user.activated ? "Deactivate" : "Activate"}</button>
                                             <button className="bg-yellow-500 px-2 py-1 mx-1 rounded" onClick={() => handleEditUser(user)}>Edit</button>
-                                            <button className="bg-blue-500 px-2 py-1 mx-1 rounded">View</button>
+                                            <button className="bg-blue-500 px-2 py-1 mx-1 rounded" onClick={() => setViewUser(user)}>View</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -133,3 +137,5 @@
 </body>
 </html>
 
+
+                     
