@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.20.12/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-6 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const ProductManagement = () => {
+            const [products, setProducts] = useState([
+                { id: 1, name: "Arduino UNO (R3)", price: 399, category: "Electronics", location: "Rockhunters IT Solutions" },
+                { id: 2, name: "Alkaline Battery AAA-2B", price: 80, category: "Battery", location: "Warehouse" },
+                { id: 3, name: "Rechargeable Battery AA 700mAh", price: 650, category: "Battery", location: "Store Room" },
+                { id: 4, name: "Potassium Sorbate", price: 135, category: "Chemicals", location: "Lab" },
+            ]);
+
+            const [filter, setFilter] = useState("");
+            const [editProduct, setEditProduct] = useState(null);
+            const [newProduct, setNewProduct] = useState({ id: "", name: "", price: "", category: "", location: "" });
+
+            // Filtered Products List
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(filter.toLowerCase()) ||
+                product.category.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            // Handle Input Change for New Product
+            const handleInputChange = (e) => {
+                setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+            };
+
+            // Add Product Function
+            const addProduct = () => {
+                if (newProduct.name && newProduct.price && newProduct.category) {
+                    setProducts([...products, { ...newProduct, id: products.length + 1 }]);
+                    setNewProduct({ id: "", name: "", price: "", category: "", location: "" });
+                }
+            };
+
+            // Edit Product Function
+            const handleEdit = (product) => {
+                setEditProduct(product);
+            };
+
+            // Save Edited Product
+            const saveEdit = () => {
+                setProducts(products.map(p => p.id === editProduct.id ? editProduct : p));
+                setEditProduct(null);
+            };
+
+            return (
+                <div className="max-w-4xl mx-auto">
+                    <h1 className="text-2xl font-bold text-center text-blue-400">Product Management</h1>
+                    
+                    {/* Filter and Add Product Buttons */}
+                    <div className="flex justify-between my-4">
+                        <input 
+                            type="text" 
+                            placeholder="Search by name or category..." 
+                            className="px-4 py-2 bg-gray-800 rounded text-white w-full"
+                            onChange={(e) => setFilter(e.target.value)}
+                        />
+                        <button onClick={addProduct} className="bg-green-500 px-4 py-2 mx-2 rounded">+ Add Product</button>
+                    </div>
+
+                    {/* Product Table */}
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-gray-700 text-blue-400">
+                                    <th className="p-2">ID</th>
+                                    <th className="p-2">Name</th>
+                                    <th className="p-2">Price</th>
+                                    <th className="p-2">Category</th>
+                                    <th className="p-2">Location</th>
+                                    <th className="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredProducts.map(product => (
+                                    <tr key={product.id} className="border-b border-gray-700">
+                                        <td className="p-2">{product.id}</td>
+                                        <td className="p-2">
+                                            {editProduct?.id === product.id ? (
+                                                <input 
+                                                    type="text" 
+                                                    value={editProduct.name}
+                                                    onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                                                    className="bg-gray-700 px-2 py-1 rounded text-white"
+                                                />
+                                            ) : (
+                                                product.name
+                                            )}
+                                        </td>
+                                        <td className="p-2">{product.price}</td>
+                                        <td className="p-2">{product.category}</td>
+                                        <td className="p-2">{product.location}</td>
+                                        <td className="p-2">
+                                            {editProduct?.id === product.id ? (
+                                                <button onClick={saveEdit} className="bg-green-500 px-2 py-1 mx-1 rounded">Save</button>
+                                            ) : (
+                                                <button onClick={() => handleEdit(product)} className="bg-yellow-500 px-2 py-1 mx-1 rounded">Edit</button>
+                                            )}
+                                            <button className="bg-blue-500 px-2 py-1 mx-1 rounded">View</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Add New Product Form */}
+                    <div className="bg-gray-800 p-4 mt-4 rounded-lg">
+                        <h2 className="text-xl text-blue-400">Add New Product</h2>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                            <input 
+                                type="text" 
+                                name="name" 
+                                placeholder="Product Name" 
+                                value={newProduct.name} 
+                                onChange={handleInputChange}
+                                className="bg-gray-700 px-4 py-2 rounded text-white w-full"
+                            />
+                            <input 
+                                type="number" 
+                                name="price" 
+                                placeholder="Price" 
+                                value={newProduct.price} 
+                                onChange={handleInputChange}
+                                className="bg-gray-700 px-4 py-2 rounded text-white w-full"
+                            />
+                            <input 
+                                type="text" 
+                                name="category" 
+                                placeholder="Category" 
+                                value={newProduct.category} 
+                                onChange={handleInputChange}
+                                className="bg-gray-700 px-4 py-2 rounded text-white w-full"
+                            />
+                            <input 
+                                type="text" 
+                                name="location" 
+                                placeholder="Location" 
+                                value={newProduct.location} 
+                                onChange={handleInputChange}
+                                className="bg-gray-700 px-4 py-2 rounded text-white w-full"
+                            />
+                        </div>
+                        <button onClick={addProduct} className="bg-green-500 px-4 py-2 mt-2 rounded w-full">Add Product</button>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById("root")).render(<ProductManagement />);
+    </script>
+</body>
+</html>
