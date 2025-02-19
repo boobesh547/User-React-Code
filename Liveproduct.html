@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Product Dashboard</title>
+
+    <!-- React & ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel (for JSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.20.12/babel.min.js"></script>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-white p-4 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const Dashboard = () => {
+            const [products, setProducts] = useState([
+                { id: 1, name: "Laptop", price: 800, stock: 10, sales: 5 },
+                { id: 2, name: "Smartphone", price: 500, stock: 15, sales: 8 },
+                { id: 3, name: "Headphones", price: 100, stock: 20, sales: 12 }
+            ]);
+            const [newProduct, setNewProduct] = useState({ name: "", price: "", stock: "", sales: 0 });
+            const [editingProduct, setEditingProduct] = useState(null);
+            const [chartInstance, setChartInstance] = useState(null);
+
+            // Handle input change
+            const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setNewProduct({ ...newProduct, [name]: value });
+            };
+
+            // Add or edit product
+            const handleAddProduct = () => {
+                if (editingProduct) {
+                    setProducts(products.map(p => p.id === editingProduct.id ? { ...editingProduct, ...newProduct, price: Number(newProduct.price), stock: Number(newProduct.stock), sales: Number(newProduct.sales) } : p));
+                    setEditingProduct(null);
+                } else {
+                    setProducts([...products, { id: Date.now(), ...newProduct, price: Number(newProduct.price), stock: Number(newProduct.stock), sales: Number(newProduct.sales) }]);
+                }
+                setNewProduct({ name: "", price: "", stock: "", sales: 0 });
+            };
+
+            // Edit product
+            const handleEditProduct = (product) => {
+                setEditingProduct(product);
+                setNewProduct(product);
+            };
+
+            // Delete specific product
+            const handleDeleteProduct = (id) => {
+                setProducts(products.filter(product => product.id !== id));
+            };
+
+            // Get top-selling product
+            const topSellingProduct = products.reduce((max, p) => (p.sales > (max.sales || 0) ? p : max), {});
+
+            // Update sales chart dynamically
+            useEffect(() => {
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+                const ctx = document.getElementById('salesChart');
+                if (ctx) {
+                    const newChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: products.map(p => p.name),
+                            datasets: [{
+                                label: 'Sales Percentage',
+                                data: products.map(p => p.sales),
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(75, 192, 192, 0.6)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                }
+                            }
+                        }
+                    });
+                    setChartInstance(newChart);
+                }
+            }, [products]);
+
+            return (
+                <div className="max-w-5xl mx-auto">
+                    <h1 className="text-2xl font-bold text-blue-400 text-center mb-4">Live Product Dashboard</h1>
+
+                    <button className="bg-gray-600 px-4 py-2 rounded mb-4" onClick={() => alert('Going back!')}>⬅ Back</button>
+
+                    {/* Statistics */}
+                    <div className="bg-gray-800 p-4 rounded-lg flex justify-between mb-4">
+                        <div>
+                            <h2 className="text-lg font-bold">Total Products</h2>
+                            <p className="text-2xl">{products.length}</p>
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold">Total Sales</h2>
+                            <p className="text-2xl">{products.reduce((sum, p) => sum + p.sales, 0)}</p>
+                        </div>
+                    </div>
+
+                    {/* Top Selling Product */}
+                    <div className="bg-green-500 text-white p-3 rounded-lg mb-4">
+                        <h2 className="text-lg font-bold">🔥 Top Selling Product</h2>
+                        <p className="text-xl">{topSellingProduct.name || "N/A"} ({topSellingProduct.sales || 0} Sales)</p>
+                    </div>
+
+                    {/* Add/Edit Product Form */}
+                    <div className="bg-gray-800 p-4 rounded-lg mb-4">
+                        <h2 className="text-lg font-bold mb-2">{editingProduct ? "Edit Product" : "Add New Product"}</h2>
+                        <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} className="bg-gray-700 p-2 rounded w-full mb-2"/>
+                        <input type="number" name="price" placeholder="Price ($)" value={newProduct.price} onChange={handleInputChange} className="bg-gray-700 p-2 rounded w-full mb-2"/>
+                        <input type="number" name="stock" placeholder="Stock" value={newProduct.stock} onChange={handleInputChange} className="bg-gray-700 p-2 rounded w-full mb-2"/>
+                        <input type="number" name="sales" placeholder="Sales" value={newProduct.sales} onChange={handleInputChange} className="bg-gray-700 p-2 rounded w-full mb-2"/>
+                        <button className="bg-green-500 px-4 py-2 rounded" onClick={handleAddProduct}>{editingProduct ? "Update" : "Add"}</button>
+                    </div>
+
+                    {/* Product Table */}
+                    <div className="bg-gray-800 p-4 rounded-lg">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-gray-700">
+                                    <th className="p-2">ID</th>
+                                    <th className="p-2">Product Name</th>
+                                    <th className="p-2">Price ($)</th>
+                                    <th className="p-2">Stock</th>
+                                    <th className="p-2">Sales</th>
+                                    <th className="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {products.map(product => (
+                                    <tr key={product.id} className="border-b border-gray-700">
+                                        <td className="p-2">{product.id}</td>
+                                        <td className="p-2">{product.name}</td>
+                                        <td className="p-2">${product.price}</td>
+                                        <td className="p-2">{product.stock}</td>
+                                        <td className="p-2">{product.sales}</td>
+                                        <td className="p-2">
+                                            <button className="bg-red-500 px-2 py-1 rounded" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Sales Chart */}
+                    <div className="bg-gray-800 p-4 rounded-lg mt-4 w-1/2 mx-auto">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
+    </script>
+</body>
+</html>
