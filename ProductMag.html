@@ -57,6 +57,11 @@
                 setEditProduct(null);
             };
 
+            // Delete Product Function
+            const handleDelete = (id) => {
+                setProducts(products.filter(product => product.id !== id));
+            };
+
             return (
                 <div className="max-w-4xl mx-auto">
                     <h1 className="text-2xl font-bold text-center text-blue-400">Product Management</h1>
@@ -111,6 +116,7 @@
                                                 <button onClick={() => handleEdit(product)} className="bg-yellow-500 px-2 py-1 mx-1 rounded">Edit</button>
                                             )}
                                             <button className="bg-blue-500 px-2 py-1 mx-1 rounded">View</button>
+                                            <button onClick={() => handleDelete(product.id)} className="bg-red-500 px-2 py-1 mx-1 rounded">Delete</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -164,4 +170,5 @@
         ReactDOM.createRoot(document.getElementById("root")).render(<ProductManagement />);
     </script>
 </body>
-</html>
+</html>                                   
+                 
