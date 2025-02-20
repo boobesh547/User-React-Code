@@ -53,6 +53,12 @@
                 setShowForm(true);
             };
 
+            // Delete category
+            const handleDeleteCategory = (id) => {
+                const updatedCategories = categories.filter(category => category.id !== id);
+                setCategories(updatedCategories);
+            };
+
             // Filter categories
             const filteredCategories = categories.filter(category =>
                 category.name.toLowerCase().includes(filterText.toLowerCase()) ||
@@ -107,6 +113,7 @@
                                         <td className="p-2">
                                             <button className="bg-yellow-500 px-2 py-1 mx-1 rounded" onClick={() => handleEditCategory(category)}>Edit</button>
                                             <button className="bg-blue-500 px-2 py-1 mx-1 rounded">View</button>
+                                            <button className="bg-red-500 px-2 py-1 mx-1 rounded" onClick={() => handleDeleteCategory(category.id)}>Delete</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -121,7 +128,3 @@
     </script>
 </body>
 </html>
-
-
-        
-          
